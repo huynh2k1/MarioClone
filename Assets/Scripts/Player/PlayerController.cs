@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Unity.Android.Gradle;
 using UnityEngine;
-
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController instance;
@@ -20,9 +19,10 @@ public class PlayerController : MonoBehaviour
 
     private bool moveRight;
     private bool moveLeft;
-    private bool moveUp;
     private bool isGround;
     public bool isShoot;
+
+    public List<GameObject> listPlayerObj;
 
     private void Awake()
     {
@@ -38,9 +38,9 @@ public class PlayerController : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
         moveLeft = false;
         moveRight = false;
-        moveUp = false;
         isGround = false;
         isShoot = false;
+        listPlayerObj[Pref.selectingPlayer - 1].SetActive(true);
     }
 
     private void Update()
@@ -55,70 +55,59 @@ public class PlayerController : MonoBehaviour
                 isShoot = false;
             }
         }
-        Move();
+        MoveInMobile();
+        MoveInPC();
     }
     private void FixedUpdate()
     {
-        Jump();
         transform.Translate(Vector2.right * speed * horizontalSpeed * Time.deltaTime, Space.Self);
-        
-        //Fire();
     }
-
-    private void Move()
+    private void MoveInPC()
     {
+        if(Input.GetKey(KeyCode.A))
+        {
+            
+            transform.Translate(Vector2.left * speed * Time.deltaTime, Space.Self);
+            _animator.SetFloat("Speed", 1);
+            _spriteRenderer.flipX = true;
+
+        }
+        else if(Input.GetKey(KeyCode.D))
+        {
+            
+            transform.Translate(Vector2.right * speed * Time.deltaTime, Space.Self);
+            _animator.SetFloat("Speed", 1);
+            _spriteRenderer.flipX = false;
+        }
+        else
+        {
+            _animator.SetFloat("Speed", 0);
+        }
+        if(Input.GetKey(KeyCode.W) && isGround == true)
+        {
+            _rb2D.velocity = new Vector2(_rb2D.velocity.x, jumpForce);
+            _animator.SetBool("Jumping", true);
+        }
+    }
+    private void MoveInMobile()
+    {
+        horizontalSpeed = Input.GetAxis("Horizontal");
         if (moveLeft)
         {
-            //if (isGround == false)
-            //{
-            //    _animator.SetBool("Jumping", true);
-            //    horizontalSpeed = -1;
-            //    _spriteRenderer.flipX = true;
-            //}
-            //else
-            //{
-            //    _animator.SetBool("Jumping", false);
-            //    horizontalSpeed = -1;
-            //    _spriteRenderer.flipX = true;
-            //    _animator.SetFloat("Speed", 1);
-            //}
+            
             horizontalSpeed = -1;
             _spriteRenderer.flipX = true;
             _animator.SetFloat("Speed", 1);
         }
         else if (moveRight)
         {
-            //if (isGround == false)
-            //{
-            //    _animator.SetBool("Jumping", true);
-            //    horizontalSpeed = 1;
-            //    _spriteRenderer.flipX = false ;
-            //}
-            //else
-            //{
-            //    _animator.SetBool("Jumping", false);
-            //    horizontalSpeed = 1;
-            //    _spriteRenderer.flipX = false;
-            //    _animator.SetFloat("Speed", 1);
-            //}
+            
             horizontalSpeed = 1;
             _spriteRenderer.flipX = false;
             _animator.SetFloat("Speed", 1);
         }
         else
         {
-            //if(isGround == false)
-            //{
-            //    _animator.SetBool("Jumping", true);
-            //    horizontalSpeed = 0;
-            //    _animator.SetFloat("Speed", 0);
-            //}
-            //else
-            //{
-            //    _animator.SetBool("Jumping", false);
-            //    horizontalSpeed = 0;
-            //    _animator.SetFloat("Speed", 0);
-            //}
             horizontalSpeed = 0;
             _animator.SetFloat("Speed", 0);
         }
@@ -126,17 +115,9 @@ public class PlayerController : MonoBehaviour
     private void Jump()
     {
         //Nếu click button Jump và đang ở dưới đất là đúng 
-        if (moveUp == true && isGround == true)
+        if (isGround == true)
         {
             _rb2D.velocity = new Vector2(_rb2D.velocity.x, jumpForce);
-        }
-        //Nếu đang ở dưới đất => Jump action = false
-        if (isGround)
-        {
-            _animator.SetBool("Jumping", false);
-        }
-        if (moveUp && isGround)
-        {
             _animator.SetBool("Jumping", true);
         }
     }
@@ -171,11 +152,11 @@ public class PlayerController : MonoBehaviour
     public void ClickJump()
     {
         Debug.Log("Da cham dat");
-        moveUp = true;
+        Jump();
     }
     public void UnClickJump()
     {
-        moveUp = false;
+        //moveUp = false;
     }
     public void ClickFire()
     {
@@ -206,6 +187,14 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             Debug.Log("Đang dưới mặt đất");
+            _animator.SetBool("Jumping", false);
+        }
+        
+    }
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
             isGround = true;
         }
         
@@ -226,6 +215,7 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("win");
             //UIManager.Instance.GameWin();
+            GameManager.Instance.Win();
         }
     }
 }

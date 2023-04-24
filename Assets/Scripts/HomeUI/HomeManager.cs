@@ -49,7 +49,7 @@ public class HomeManager : MonoBehaviour
     }
     public void PlayButton()
     {
-        SceneManager.LoadScene("GamePlay");
+       
     }
     public void CoinUpdate()
     {

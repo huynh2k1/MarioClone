@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 
     public Dialog PauseDialog;
     public Dialog WinDialog;
+    public Dialog LoseDialog;
 
     private Dialog _curDialog;
     public Dialog curDialog { get => _curDialog; set => _curDialog = value; }
@@ -23,6 +24,9 @@ public class GameManager : MonoBehaviour
     public int time = 0;
     public int coin = 0;
 
+
+    public List<GameObject> listLevelObj;
+
     private void Awake()
     {
         if (Instance == null)
@@ -34,6 +38,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         StatUpdate();
+        listLevelObj[Pref.levelLoading-1].SetActive(true);
     }
 
     public void PauseBtn()
@@ -65,6 +70,15 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 0;
             WinDialog.Show(true);
             curDialog = WinDialog;
+        }
+    }
+    public void Lose()
+    {
+        if (LoseDialog)
+        {
+            Time.timeScale = 0;
+            LoseDialog.Show(true);
+            curDialog = LoseDialog;
         }
     }
     public void StatUpdate()

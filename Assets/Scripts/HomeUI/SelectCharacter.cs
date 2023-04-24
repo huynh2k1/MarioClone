@@ -9,7 +9,7 @@ public class SelectCharacter : MonoBehaviour
     public GameObject[] characters;
     public GameObject[] characterPrefabs;
 
-    public Text nameCharacter;
+    //public Text nameCharacter;
     public static GameObject selectedPlayer;
 
 
@@ -45,7 +45,7 @@ public class SelectCharacter : MonoBehaviour
                 characters[i].GetComponent<SpriteRenderer>().color = Color.white;
                 characters[i].GetComponent<Animator>().enabled = true;
                 selectedPlayer = characterPrefabs[i];
-                nameCharacter.text = characterPrefabs[i].name;
+                //nameCharacter.text = characterPrefabs[i].name;
             }
             else
             {
